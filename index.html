@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f3ee" />
+    <title>
+      TRIAGE — Multi-Agent Business Risk Intelligence | Jessenth Ebenezer
+    </title>
+    <meta
+      name="description"
+      content="An engineering case study of the YHack TRIAGE prototype and TRIAGE+: specialist orchestration, evidence integrity, durable jobs, and a clinical analysis workstation."
+    />
+    <link rel="canonical" href="https://projects.jessenth.com/triageplus/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="TRIAGE — Business Risk Intelligence" />
+    <meta
+      property="og:description"
+      content="The engineering behind TRIAGE+: evidence rules, specialist workflows, and the analytical workstation that grew out of a YHack team project."
+    />
+    <meta
+      property="og:url"
+      content="https://projects.jessenth.com/triageplus/"
+    />
+    <meta
+      property="og:image"
+      content="https://projects.jessenth.com/triageplus/assets/originals/workstation-report.jpg"
+    />
+    <meta
+      property="og:image:alt"
+      content="Actual TRIAGE+ report interface displaying a clearly synthetic coffee-company test case"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;450;500;550;600;650;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to case study</a>
+    <header class="topbar">
+      <a href="../">← All projects</a>
+      <nav aria-label="Main">
+        <a href="https://jessenth.com/tech/">Jessenth Ebenezer</a
+        ><a href="#access">Demo access ↗</a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="title">
+        <div class="hero-top">
+          <p class="context">
+            Engineering case study · YHack 2026 / continued development
+          </p>
+          <span class="edition">Engineering snapshot · 27 October 2026</span>
+        </div>
+        <div class="hero-title">
+          <h1 id="title">TRIAGE<span>Business risk intelligence</span></h1>
+          <p class="lede">
+            A specialist investigation system, rebuilt around the evidence
+            behind each finding.
+          </p>
+        </div>
+        <div class="project-facts">
+          <span>Python / FastAPI</span><span>React / Vite</span
+          ><span>SQLite</span><span>Lava / Tavily</span
+          ><a href="#architecture">Explore the system ↓</a>
+        </div>
+        <figure class="hero-image">
+          <a
+            class="image-link"
+            href="assets/originals/workstation-report.jpg"
+            data-image
+            aria-label="Enlarge TRIAGE+ report screenshot"
+            ><img
+              src="assets/workstation-report.webp"
+              width="1280"
+              height="720"
+              alt="TRIAGE+ clinical report: separate health, evidence confidence and coverage readouts above user-fact, simulated and unknown findings"
+              fetchpriority="high"
+            /><span class="enlarge">Enlarge ↗</span></a
+          >
+          <figcaption>
+            <span>TRIAGE+ · Reconciled report</span
+            ><span
+              >Actual application. Synthetic Northstar Coffee regression fixture
+              throughout the workstation images.</span
+            >
+          </figcaption>
+        </figure>
+        <div class="availability">
+          <p>
+            <strong>Original TRIAGE</strong
+            ><a
+              href="https://triage-production-b22c.up.railway.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              >Try the hackathon-era demo ↗</a
+            >
+          </p>
+          <p>
+            <strong>TRIAGE+</strong><span>Interactive demo coming soon</span>
+          </p>
+        </div>
+      </section>
+      <div class="reading-layout">
+        <aside class="contents">
+          <nav aria-label="Case study sections">
+            <p>In this case study</p>
+            <a href="#origin">Origins &amp; evolution</a
+            ><a href="#workstation">The workstation</a
+            ><a href="#architecture">Execution graph</a
+            ><a href="#evidence">Evidence integrity</a
+            ><a href="#reliability">Execution &amp; failure</a
+            ><a href="#verification">Verification &amp; limits</a
+            ><a href="#contributions">History &amp; contributions</a
+            ><a href="#access">Demo access</a>
+          </nav>
+        </aside>
+        <div class="article">
+          <section id="origin" class="section">
+            <p class="section-label">Origins &amp; evolution</p>
+            <h2>Several investigations.<br />One business case.</h2>
+            <div class="prose">
+              <p>
+                A business description can raise several different questions.
+                Who supplies the business? What happens if a critical supplier
+                fails? Which competitors matter? What regulatory activity needs
+                investigation? Each question needs its own research, while the
+                final assessment needs to account for how those answers depend
+                on each other.
+              </p>
+              <p>
+                At YHack 2026, our team built TRIAGE to coordinate due
+                diligence, stress testing, competitive intelligence and
+                compliance analysis. The prototype gave those functions separate
+                workflows and brought them together in a synthesized report.
+                That division of work remains the foundation of TRIAGE+.
+              </p>
+            </div>
+            <figure class="historical">
+              <a
+                class="image-link"
+                href="assets/originals/original-triage.jpg"
+                data-image
+                aria-label="Enlarge original TRIAGE interface"
+                ><img
+                  src="assets/original-triage.webp"
+                  width="1434"
+                  height="996"
+                  loading="lazy"
+                  alt="Original TRIAGE dark interface with red accents, business-description input and five analysis tabs"
+                /><span class="enlarge">Enlarge ↗</span></a
+              >
+              <figcaption>
+                Original TRIAGE submission screen, captured from the existing
+                Railway deployment on 27 October 2026. No investigation was
+                started for this capture.
+              </figcaption>
+            </figure>
+            <div class="prose">
+              <h3>What needed to change</h3>
+              <p>
+                The prototype could produce specialist reports, but its JSON
+                contracts and citation formats varied between agents. Model
+                interpretations could acquire confidence as they passed between
+                stages. Reports primarily lived in browser state, making long
+                investigations difficult to inspect after a failure.
+              </p>
+              <p>
+                TRIAGE+ adds a common finding contract around the existing
+                specialists. Each finding carries an identity, claim class,
+                evidence references and uncertainty. Reconciliation applies
+                deterministic rules before a finding can affect the report.
+                Stored snapshots and job checkpoints make the investigation
+                inspectable beyond the current browser session.
+              </p>
+            </div>
+            <div
+              class="change-table"
+              role="region"
+              aria-label="Engineering evolution"
+            >
+              <table>
+                <thead>
+                  <tr>
+                    <th>Development pressure</th>
+                    <th>Implemented response</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Generated interpretation presented like evidence</td>
+                    <td>Explicit claim classes and quotation-support checks</td>
+                  </tr>
+                  <tr>
+                    <td>Inconsistent specialist output</td>
+                    <td>
+                      Validated finding envelopes; valid items survive malformed
+                      siblings
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Lost context after failure</td>
+                    <td>
+                      SQLite snapshots, stage checkpoints and durable job
+                      records
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Opaque multi-minute execution</td>
+                    <td>
+                      Real stage states, usage ledgers and cooperative
+                      cancellation
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section id="workstation" class="section">
+            <p class="section-label">The workstation</p>
+            <h2>A case file you can inspect.</h2>
+            <div class="prose">
+              <p>
+                The interface follows a laboratory workstation: a persistent
+                case header, compact metadata, ruled registers and status
+                readouts. IBM Plex Sans carries the application text; monospace
+                is reserved for identifiers and measurements. Light mode is the
+                default. Color distinguishes actions, evidence classes and
+                execution states.
+              </p>
+              <p>
+                The original interface centered on submitting a description.
+                TRIAGE+ gives the resulting case a stable place to work:
+                specialist results, source records, a reconciled report and an
+                archive share the same navigation.
+              </p>
+            </div>
+            <div class="comparison">
+              <figure>
+                <a
+                  class="image-link"
+                  href="assets/originals/original-triage.jpg"
+                  data-image
+                  aria-label="Enlarge original submission screen"
+                  ><img
+                    src="assets/original-triage.webp"
+                    width="1434"
+                    height="996"
+                    loading="lazy"
+                    alt="Original dark submission screen"
+                  /><span class="enlarge">Enlarge ↗</span></a
+                >
+                <figcaption>
+                  <strong>Original TRIAGE</strong>Business input and specialist
+                  tabs. A direct entry into the hackathon workflow.
+                </figcaption>
+              </figure>
+              <figure>
+                <a
+                  class="image-link"
+                  href="assets/originals/workstation-overview.jpg"
+                  data-image
+                  aria-label="Enlarge TRIAGE+ case overview"
+                  ><img
+                    src="assets/workstation-overview.webp"
+                    width="1280"
+                    height="720"
+                    loading="lazy"
+                    alt="TRIAGE+ case overview with business context, finding definitions and a module status register"
+                  /><span class="enlarge">Enlarge ↗</span></a
+                >
+                <figcaption>
+                  <strong>TRIAGE+</strong>A case overview with recorded context
+                  and per-module status. Synthetic test fixture.
+                </figcaption>
+              </figure>
+            </div>
+            <figure>
+              <a
+                class="image-link"
+                href="assets/originals/workstation-inspector.jpg"
+                data-image
+                aria-label="Enlarge finding evidence inspector"
+                ><img
+                  src="assets/workstation-inspector.webp"
+                  width="1280"
+                  height="720"
+                  loading="lazy"
+                  alt="Evidence inspector for supplier concentration, showing a user-supplied statement, support check and independence limits"
+                /><span class="enlarge">Enlarge ↗</span></a
+              >
+              <figcaption>
+                <strong>Inspect the claim, then its support.</strong> The drawer
+                keeps severity separate from confidence and identifies the
+                supplier statement as user-supplied. It has no independent
+                source group. Synthetic test fixture.
+              </figcaption>
+            </figure>
+            <details class="gallery-more">
+              <summary>
+                Explore the source register and analysis archive
+                <span>2 more views</span>
+              </summary>
+              <figure>
+                <a
+                  class="image-link"
+                  href="assets/originals/workstation-sources.jpg"
+                  data-image
+                  aria-label="Enlarge evidence library"
+                  ><img
+                    src="assets/workstation-sources.webp"
+                    width="1280"
+                    height="720"
+                    loading="lazy"
+                    alt="Evidence library with a synthetic Northstar supply excerpt, source domain and retrieval timestamp"
+                  /><span class="enlarge">Enlarge ↗</span></a
+                >
+                <figcaption>
+                  Source records retain their excerpt, URL and retrieval time.
+                  The <code>.example</code> domain belongs to the deterministic
+                  test fixture.
+                </figcaption>
+              </figure>
+              <figure>
+                <a
+                  class="image-link"
+                  href="assets/originals/workstation-history.jpg"
+                  data-image
+                  aria-label="Enlarge analysis history"
+                  ><img
+                    src="assets/workstation-history.webp"
+                    width="1280"
+                    height="720"
+                    loading="lazy"
+                    alt="Analysis history listing stored specialist runs and the report, with complete and degraded states"
+                  /><span class="enlarge">Enlarge ↗</span></a
+                >
+                <figcaption>
+                  History restores saved inputs and structured results. A
+                  degraded result remains available for inspection. Synthetic
+                  test fixture.
+                </figcaption>
+              </figure>
+            </details>
+          </section>
+          <section id="architecture" class="section">
+            <p class="section-label">Execution graph</p>
+            <h2>Specialists inside a controlled workflow.</h2>
+            <div class="prose">
+              <p>
+                FastAPI schedules explicit dependencies. Due diligence
+                establishes the initial context; stress testing, competitive
+                intelligence and compliance then run as parallel branches. These
+                are programmed handoffs. The model does not choose an arbitrary
+                execution plan.
+              </p>
+            </div>
+            <figure
+              class="architecture"
+              tabindex="0"
+              aria-label="Execution graph; scroll horizontally on small screens"
+            >
+              <svg
+                viewBox="0 0 900 760"
+                role="img"
+                aria-labelledby="graph-title graph-desc"
+              >
+                <title id="graph-title">
+                  TRIAGE+ automatic investigation pipeline
+                </title>
+                <desc id="graph-desc">
+                  Case context enters due diligence. Three parallel branches
+                  follow: stress testing; market mapping then parallel signal
+                  and news research then opportunities; compliance detection
+                  then realtime research then advisor. All feed evidence
+                  reconciliation and constrained report synthesis. Each
+                  specialist uses shared model and retrieval clients and stores
+                  structured results. SQLite records stages and usage.
+                </desc>
+                <defs>
+                  <marker
+                    id="arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="6"
+                    markerHeight="6"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M0 0 10 5 0 10z" fill="#637b82" />
+                  </marker>
+                </defs>
+                <g
+                  class="connections"
+                  fill="none"
+                  stroke="#637b82"
+                  stroke-width="1.5"
+                  marker-end="url(#arrow)"
+                >
+                  <path d="M450 70V101" />
+                  <path d="M450 155V180H150V210" />
+                  <path d="M450 155V210" />
+                  <path d="M450 155V180H750V210" />
+                  <path d="M450 266V291" />
+                  <path d="M450 347V372" />
+                  <path d="M750 266V291" />
+                  <path d="M750 347V372" />
+                  <path d="M150 330V465H450V498" />
+                  <path d="M450 428V498" />
+                  <path d="M750 428V465H450" />
+                  <path d="M450 554V583" />
+                  <path d="M450 639V667" />
+                </g>
+                <g class="node">
+                  <rect x="310" y="14" width="280" height="56" />
+                  <text x="450" y="38">User-supplied case context</text>
+                  <text class="sub" x="450" y="57">
+                    Business description · server-owned run
+                  </text>
+                  <rect x="310" y="101" width="280" height="54" />
+                  <text x="450" y="125">Due diligence</text>
+                  <text class="sub" x="450" y="144">
+                    Validate · extract · research
+                  </text>
+                </g>
+                <g class="node branch">
+                  <rect x="20" y="210" width="260" height="120" />
+                  <text x="150" y="238">Stress testing</text>
+                  <text class="sub" x="150" y="266">
+                    Pessimist → Resilience
+                  </text>
+                  <text class="sub" x="150" y="291">→ Synthesizer</text>
+                  <text class="sub" x="150" y="315">
+                    Scenario output stays SIMULATED
+                  </text>
+                  <rect x="320" y="210" width="260" height="56" />
+                  <text x="450" y="235">Market mapping</text>
+                  <text class="sub" x="450" y="253">
+                    Up to 4 selected candidates
+                  </text>
+                  <rect x="320" y="291" width="260" height="56" />
+                  <text x="450" y="316">Signals ∥ News &amp; funding</text>
+                  <text class="sub" x="450" y="334">Parallel research</text>
+                  <rect x="320" y="372" width="260" height="56" />
+                  <text x="450" y="396">Opportunity synthesis</text>
+                  <text class="sub" x="450" y="415">
+                    Missing competitors ≠ demand
+                  </text>
+                  <rect x="620" y="210" width="260" height="56" />
+                  <text x="750" y="235">Compliance detection</text>
+                  <text class="sub" x="750" y="253">
+                    Activity · jurisdiction
+                  </text>
+                  <rect x="620" y="291" width="260" height="56" />
+                  <text x="750" y="316">Realtime research</text>
+                  <text class="sub" x="750" y="334">Source-backed updates</text>
+                  <rect x="620" y="372" width="260" height="56" />
+                  <text x="750" y="396">Compliance advisor</text>
+                  <text class="sub" x="750" y="415">
+                    Applicability remains constrained
+                  </text>
+                </g>
+                <g class="node final">
+                  <rect x="210" y="498" width="480" height="56" />
+                  <text x="450" y="523">
+                    Deterministic evidence reconciliation
+                  </text>
+                  <text class="sub" x="450" y="542">
+                    Revalidate findings · conflicts · scoring eligibility
+                  </text>
+                  <rect x="210" y="583" width="480" height="56" />
+                  <text x="450" y="608">
+                    Constrained cross-domain + executive selection
+                  </text>
+                  <text class="sub" x="450" y="627">
+                    Validate proposed links · select existing finding IDs
+                  </text>
+                  <rect x="310" y="667" width="280" height="56" />
+                  <text x="450" y="692">Report &amp; workstation</text>
+                  <text class="sub" x="450" y="711">
+                    Findings · actions · evidence · gaps
+                  </text>
+                </g>
+              </svg>
+              <figcaption>
+                Automatic sequence in <code>backend/api/main.py</code>. Nine
+                specialist finding envelopes feed the final report. Internal
+                sub-agents and reconciliation can each require additional model
+                calls.
+              </figcaption>
+            </figure>
+            <div class="system-rails">
+              <div>
+                <h3>Shared execution services</h3>
+                <p>
+                  Lava supplies OpenAI-compatible inference; Tavily supplies
+                  retrieval. Central clients bound retries, reject malformed
+                  responses and record attempts against the investigation
+                  budget.
+                </p>
+              </div>
+              <div>
+                <h3>Structured results &amp; persistence</h3>
+                <p>
+                  Each specialist is wrapped in a validated finding contract.
+                  SQLite stores report snapshots, job checkpoints and usage
+                  records; the workstation reads those persisted results.
+                </p>
+              </div>
+            </div>
+            <div class="prose">
+              <p>
+                The final report first gathers and revalidates specialist
+                findings. A model may propose cross-domain connections, which
+                face further validation; executive prioritization selects
+                existing finding IDs. Deterministic scoring uses structured
+                severity, likelihood and evidence confidence. Those inputs
+                remain estimates, so a transparent formula does not make the
+                score a calibrated probability.
+              </p>
+            </div>
+          </section>
+          <section id="evidence" class="section">
+            <p class="section-label">Evidence integrity</p>
+            <h2>What does this statement actually establish?</h2>
+            <div class="prose">
+              <p>
+                A citation can be real while the attached claim is unsupported.
+                The October hardening pass tightened the observational gate: the
+                whole claim statement must be reproduced from a valid retrieved
+                quotation. A shortened sentence that drops a condition or
+                negation cannot pass on model confidence alone.
+              </p>
+            </div>
+            <div class="evidence-example">
+              <div class="example-heading">
+                <strong
+                  >A conditional source is not an established
+                  obligation.</strong
+                ><span>Synthetic policy fixture</span>
+              </div>
+              <div class="passage">
+                <span>Retrieved quotation</span>
+                <blockquote>
+                  If Acme operates a nuclear reactor, Acme must obtain a nuclear
+                  license.
+                </blockquote>
+              </div>
+              <div class="claim">
+                <span>Proposed claim</span>
+                <p>Acme must obtain a nuclear license.</p>
+                <strong class="result">Downgraded to INFERRED</strong>
+                <p class="reason">
+                  The claim omits the triggering condition. The quoted passage
+                  does not contain the proposed whole statement.
+                </p>
+              </div>
+              <p class="fixture-ref">
+                Traceable example: <code>conditional_requirement</code> in
+                <code>tests/benchmarks/evidence_cases.json</code>. This
+                demonstrates a deterministic rule, not an assessment of a real
+                company.
+              </p>
+            </div>
+            <dl class="classifications">
+              <div>
+                <dt>USER_FACT</dt>
+                <dd>
+                  A whole statement supplied in the business description. Not
+                  independently established.
+                </dd>
+              </div>
+              <div>
+                <dt>OBSERVED</dt>
+                <dd>
+                  Direct textual support from a retrieved quotation. Source
+                  truth and attribution remain open.
+                </dd>
+              </div>
+              <div>
+                <dt>INFERRED</dt>
+                <dd>
+                  An interpretation requiring verification; unsupported
+                  paraphrases stay here.
+                </dd>
+              </div>
+              <div>
+                <dt>SIMULATED / HYPOTHETICAL</dt>
+                <dd>
+                  Scenario analysis or conditional projection. Never silently
+                  promoted to a recorded event.
+                </dd>
+              </div>
+              <div>
+                <dt>UNKNOWN</dt>
+                <dd>Insufficient information to conclude.</dd>
+              </div>
+              <div>
+                <dt>VERIFIED</dt>
+                <dd>
+                  Retained in the schema. The automated policy does not assign
+                  this class.
+                </dd>
+              </div>
+            </dl>
+            <div class="prose">
+              <p>
+                Claim class is separate from evidence availability. A search
+                failure, an empty search result and insufficient support carry
+                different states. The report can therefore retain a severe
+                simulated risk without presenting it as a documented incident.
+              </p>
+              <h3>Provenance has to survive the handoff</h3>
+              <p>
+                Source records carry IDs, URLs, excerpts and fingerprints.
+                Shared hosts, upstream references and bounded near-duplicate
+                matching help group sources that should not count as
+                independent. The current matcher compares five-word shingles in
+                the first 500 words; mirrored excerpts with changed headers can
+                still be grouped. Heavily paraphrased syndication and common
+                ownership remain difficult.
+              </p>
+              <p>
+                Known dependencies constrain downstream claim type and
+                confidence. Contradiction checks normalize a bounded vocabulary,
+                common exact quantities and units, and year/FY notation.
+                Conflicted findings are excluded from scoring; related actions
+                become investigations. Currency conversion, ranges and arbitrary
+                semantic paraphrases fall outside those comparisons.
+              </p>
+              <h3>Legal context stays explicit</h3>
+              <p>
+                Findings can record relevant activity, triggering conditions,
+                applicability source references and effective dates. Missing
+                context keeps applicability potential or unknown. Legal dates
+                require authoritative quoted support and a valid date. These
+                gates do not establish an authoritative legal conclusion.
+              </p>
+            </div>
+            <aside class="boundary">
+              <h3>The deliberate trade-off</h3>
+              <p>
+                Exact textual reproduction is inspectable, but conservative.
+                Useful paraphrases may be downgraded. Incorrect sources,
+                mistaken entity attribution and context outside an excerpt can
+                still pass a quotation check. Semantic entailment and source
+                truth remain unresolved evaluation problems.
+              </p>
+            </aside>
+          </section>
+          <section id="reliability" class="section">
+            <p class="section-label">Execution &amp; failure</p>
+            <h2>A long investigation needs a record of what happened.</h2>
+            <div class="prose">
+              <p>
+                An investigation may finish due diligence and market mapping
+                before a later provider call fails. Checkpoints preserve
+                completed stages, while parallel branches isolate failures. A
+                failed mapping stage cannot start deeper research against
+                provisional candidate names.
+              </p>
+              <p>
+                Automatic starts accept an idempotency key. A repeated matching
+                request returns the stored job; different input with the same
+                key is rejected. Canceled and interrupted keys also return their
+                existing records, avoiding an accidental new billable
+                investigation.
+              </p>
+            </div>
+            <figure
+              class="state-figure"
+              tabindex="0"
+              aria-label="Job outcome diagram; scroll horizontally on small screens"
+            >
+              <svg
+                viewBox="0 0 760 250"
+                role="img"
+                aria-labelledby="state-title state-desc"
+              >
+                <title id="state-title">Recorded investigation outcomes</title>
+                <desc id="state-desc">
+                  An admitted investigation is RUNNING and writes checkpoints.
+                  It may finish COMPLETE or DEGRADED, fail, be cooperatively
+                  canceled after active requests drain, or become INTERRUPTED
+                  when the service restarts. Interrupted stages do not
+                  automatically resume.
+                </desc>
+                <g fill="none" stroke="#637b82" stroke-width="1.5">
+                  <path
+                    d="M177 115H270M270 115V35H385M270 115V95H385M270 115V155H385M270 115V215H385"
+                  />
+                </g>
+                <g class="node">
+                  <rect x="10" y="83" width="167" height="64" />
+                  <text x="93" y="109">RUNNING</text>
+                  <text class="sub" x="93" y="131">Stage checkpoints</text>
+                  <rect x="385" y="10" width="360" height="48" />
+                  <text x="565" y="40">COMPLETE / DEGRADED</text>
+                  <rect x="385" y="70" width="360" height="48" />
+                  <text x="565" y="100">
+                    FAILED · completed results retained
+                  </text>
+                  <rect x="385" y="130" width="360" height="48" />
+                  <text x="565" y="160">CANCELED · active calls drain</text>
+                  <rect x="385" y="190" width="360" height="48" />
+                  <text x="565" y="220">INTERRUPTED · service restart</text>
+                </g>
+              </svg>
+              <figcaption>
+                Durable state recording is implemented. Automatic stage resume
+                and a distributed worker queue are not.
+              </figcaption>
+            </figure>
+            <div class="prose">
+              <p>
+                Cancellation is cooperative. New provider requests stop; an
+                accepted remote call may finish and incur cost. Admission
+                remains held while work drains. On restart, unfinished jobs
+                become <code>INTERRUPTED</code>; history restores the saved
+                results without silently replaying execution.
+              </p>
+            </div>
+            <div class="budget">
+              <h3>One shared investigation budget</h3>
+              <dl>
+                <div>
+                  <dt>Accounted / reserved tokens</dt>
+                  <dd>2,000,000</dd>
+                </div>
+                <div>
+                  <dt>Model attempts, including retries</dt>
+                  <dd>64</dd>
+                </div>
+                <div>
+                  <dt>Search attempts, including retries</dt>
+                  <dd>128</dd>
+                </div>
+                <div>
+                  <dt>Investigation deadline</dt>
+                  <dd>900 seconds</dd>
+                </div>
+                <div>
+                  <dt>Concurrent root operations</dt>
+                  <dd>1</dd>
+                </div>
+                <div>
+                  <dt>Root starts per minute</dt>
+                  <dd>12</dd>
+                </div>
+              </dl>
+              <p>
+                Configurable local defaults. Parallel specialist threads share
+                an investigation budget. Separate guided API requests are
+                separate operations.
+              </p>
+            </div>
+            <div class="prose">
+              <p>
+                Token reservations use input byte length plus the requested
+                completion allowance; returned provider usage replaces the
+                estimate when available. Unknown usage retains its reservation.
+                These are accounting controls, not exact tokenization or
+                guaranteed billing ceilings. The ledger has no configured price
+                table, and monetary cost remains unknown. Admission and
+                start-rate limits are process-local; the supported configuration
+                uses one worker.
+              </p>
+            </div>
+          </section>
+          <section id="verification" class="section">
+            <p class="section-label">Verification &amp; limits</p>
+            <h2>Test the rules.<br />Keep the accuracy question open.</h2>
+            <div class="verification-record">
+              <div><strong>100</strong><span>Backend tests</span></div>
+              <div><strong>14</strong><span>Frontend tests</span></div>
+              <div>
+                <strong>Pass</strong><span>Frontend production build</span>
+              </div>
+            </div>
+            <p class="caption">
+              Recorded by the 27 October hardening pass. Regression counts;
+              neither coverage percentages nor factual-accuracy measurements.
+            </p>
+            <div class="prose">
+              <p>
+                The suite exercises malformed model JSON, invalid reconciliation
+                items, poisoned and irrelevant evidence, dropped negation,
+                conditional claims, contradictions, partial failures,
+                cancellation, idempotency, restart handling and provider
+                budgets. Deterministic fixtures isolate policy behavior from
+                live model variability.
+              </p>
+              <p>
+                The Northstar Coffee screenshots use one of those fixtures:
+                supplied supplier concentration, a simulated disruption and
+                unresolved competitive and legal evidence. A 100%
+                module-coverage readout means each domain produced usable
+                output. It does not mean the business has been fully researched.
+              </p>
+            </div>
+            <details class="historical-run">
+              <summary>
+                A historical live run, and what it does not measure
+              </summary>
+              <p>
+                A recorded investigation on 5 October 2026 produced 54
+                structured findings and 199 source records in about 389.7
+                seconds, with usable output from all nine specialist stages. Its
+                specialist and synthesis snapshots reported an aggregate
+                1,068,479 tokens, including input/output and retry accounting.
+              </p>
+              <p>
+                This predates the latest hardening. The records do not establish
+                unique source count, current latency, factual accuracy, verified
+                spending or one million generated output tokens. Repeated
+                context remains a performance concern. The private report itself
+                is not published here.
+              </p>
+            </details>
+            <div class="limits">
+              <h3>Open engineering work</h3>
+              <ul>
+                <li>
+                  <strong>Evidence evaluation.</strong> Reviewed real-world
+                  labels, source attribution and semantic entailment; measuring
+                  abstention alongside false claims.
+                </li>
+                <li>
+                  <strong>Risk calibration.</strong> Severity and likelihood are
+                  estimates. Current scores have no demonstrated calibration
+                  against business outcomes.
+                </li>
+                <li>
+                  <strong>Public access.</strong> Real authentication, report
+                  ownership, tenant isolation and abuse-resistant entitlements
+                  are still required.
+                </li>
+                <li>
+                  <strong>Execution at scale.</strong> Durable stage resume,
+                  worker leases and distributed admission are not implemented.
+                </li>
+                <li>
+                  <strong>Provider economics.</strong> Measured context
+                  reduction, price configuration and billing reconciliation
+                  remain open.
+                </li>
+              </ul>
+            </div>
+          </section>
+          <section id="contributions" class="section">
+            <p class="section-label">History &amp; contributions</p>
+            <h2>A team prototype.<br />Continued engineering.</h2>
+            <ol class="timeline">
+              <li>
+                <time>28–29 March 2026</time>
+                <div>
+                  <h3>The YHack prototype</h3>
+                  <p>
+                    The repository records the initial due-diligence work,
+                    specialist branches and original report interface. Jessenth
+                    Ebenezer, Zuzanna Bak and Disha Shanbhag appear in the
+                    original history.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <time>5 October 2026</time>
+                <div>
+                  <h3>TRIAGE+ on <code>astra-revamp</code></h3>
+                  <p>
+                    Continued development introduces shared evidence contracts,
+                    deterministic reconciliation, local report persistence and
+                    the clinical workstation. Existing branches remain separate.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <time>27 October 2026</time>
+                <div>
+                  <h3>Evidence and execution hardening</h3>
+                  <p>
+                    Whole-statement support checks, bounded contradiction/source
+                    grouping, durable jobs, cancellation and shared resource
+                    accounting. No new live-provider evaluation was performed
+                    during this pass.
+                  </p>
+                </div>
+              </li>
+            </ol>
+            <div class="prose">
+              <p>
+                Disha Shanbhag authored the original stress-test implementation,
+                including its Pessimist, Resilience and Synthesizer workflow.
+                Later commits by Zuzanna Bak also modified that module.
+                Zuzanna’s history records substantial competitive-intelligence,
+                compliance, report and deployment work. Jessenth’s early commits
+                record the initial implementation; subsequent development under
+                Jessenth’s direction used AI coding assistance for the
+                workstation and hardening work described here.
+              </p>
+              <p>
+                The stress-test specialist was preserved during the latest
+                hardening pass. Commit history establishes code contributions,
+                but it cannot fully assign ideation, design or off-repository
+                hackathon work. Those contributions remain team-level credit. No
+                historical pitch recording or original result screenshot was
+                located for this edition.
+              </p>
+            </div>
+          </section>
+          <section id="access" class="section access">
+            <p class="section-label">Demo access</p>
+            <h2>Explore the original.<br />Follow the continued work.</h2>
+            <div class="demo-split">
+              <div>
+                <span class="status available"
+                  >Available · original deployment</span
+                >
+                <h3>TRIAGE</h3>
+                <p>
+                  The original hackathon-era business-risk prototype. The
+                  black-and-red interface is still accessible on Railway.
+                </p>
+                <a
+                  class="action"
+                  href="https://triage-production-b22c.up.railway.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Launch original TRIAGE ↗</a
+                >
+                <p class="caption">
+                  Page availability checked 27 October 2026. It is a legacy
+                  deployment; use public or synthetic business information. No
+                  live analysis was initiated for this case study.
+                </p>
+              </div>
+              <div>
+                <span class="status">Interactive demo coming soon</span>
+                <h3>TRIAGE+</h3>
+                <p>
+                  The evidence-governed workstation is currently local, under
+                  continued engineering and evaluation. Public execution awaits
+                  authentication, ownership enforcement, quotas and security
+                  review.
+                </p>
+                <p class="coming-soon">Coming soon</p>
+                <a
+                  class="text-link"
+                  href="https://github.com/sm1else-bot/triageplus"
+                  >Case study source ↗</a
+                >
+                <p class="caption">
+                  This publication contains static documentation and
+                  screenshots. It exposes no analysis backend.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <a href="../">← Back to projects</a
+      ><span>TRIAGE / TRIAGE+ · Jessenth Ebenezer &amp; collaborators</span
+      ><a href="#title">Back to top ↑</a>
+    </footer>
+    <dialog id="viewer" aria-labelledby="viewer-title">
+      <div class="viewer-toolbar">
+        <h2 id="viewer-title">Application screenshot</h2>
+        <a id="original-link">Open original image ↗</a
+        ><button id="viewer-close" aria-label="Close image viewer">
+          Close ×
+        </button>
+      </div>
+      <div class="viewer-scroll"><img id="viewer-image" alt="" /></div>
+      <p id="viewer-caption"></p>
+    </dialog>
+  </body>
+</html>
