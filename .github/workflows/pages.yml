@@ -16,6 +16,8 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Build static publication
         run: python3 tools/build_site.py
+      - name: Verify publication
+        run: python3 tools/check_site.py
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
